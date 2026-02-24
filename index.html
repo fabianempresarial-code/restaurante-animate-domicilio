@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido Online Pro</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#ff7a18;
+    --secondary:#ffb347;
+    --whatsapp:#25d366;
+    --glass:rgba(255,255,255,0.15);
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+    font-family:'Poppins',sans-serif;
+    background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+               url('https://i.imgur.com/UOPlh0M.jpeg');
+    background-size:cover;
+    background-position:center;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
+    animation:fadeIn 1s ease-in-out;
+}
+
+.container{
+    width:100%;
+    max-width:520px;
+    backdrop-filter:blur(20px);
+    background:var(--glass);
+    border-radius:25px;
+    padding:25px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.4);
+    color:white;
+    animation:slideUp 0.8s ease;
+}
+
+.header-logo{text-align:center;margin-bottom:15px;}
+.header-logo img{width:180px;border-radius:15px;animation:float 4s ease-in-out infinite;}
+
+h2{
+    margin:10px 0;
+    font-weight:700;
+    background:linear-gradient(45deg,var(--primary),var(--secondary));
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.badge{
+    display:inline-block;
+    background:rgba(255,255,255,0.2);
+    padding:6px 15px;
+    border-radius:20px;
+    font-size:13px;
+}
+
+.section{
+    margin-bottom:15px;
+    padding:15px;
+    border-radius:15px;
+    background:rgba(255,255,255,0.1);
+    transition:0.3s;
+}
+
+.section:hover{background:rgba(255,255,255,0.18);}
+
+label{font-size:14px;font-weight:600;margin-bottom:5px;display:block;}
+
+input,select,textarea{
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    margin-bottom:10px;
+    font-size:14px;
+    outline:none;
+    transition:0.3s;
+}
+
+input:focus,select:focus,textarea:focus{
+    box-shadow:0 0 10px rgba(255,255,255,0.4);
+    transform:scale(1.02);
+}
+
+.extra-item{font-size:13px;margin-bottom:5px;}
+
+.total-box{
+    text-align:center;
+    font-size:18px;
+    font-weight:700;
+    margin-top:10px;
+}
+
+.btn-order{
+    width:100%;
+    background:var(--whatsapp);
+    border:none;
+    padding:15px;
+    font-size:16px;
+    font-weight:700;
+    color:white;
+    border-radius:15px;
+    cursor:pointer;
+    transition:0.3s;
+    animation:pulse 2s infinite;
+}
+
+.btn-order:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 25px rgba(37,211,102,0.5);
+}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes pulse{
+0%{box-shadow:0 0 0 0 rgba(37,211,102,0.6)}
+70%{box-shadow:0 0 0 15px rgba(37,211,102,0)}
+100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}
+}
+</style>
+</head>
+
+<body onload="inicializarApp()">
+
+<div class="container">
+
+<div class="header-logo">
+<img src="https://i.imgur.com/3FvWdgi.gif">
+<h2>Restaurante Gourmet</h2>
+<span id="fechaHoy" class="badge"></span>
+</div>
+
+<form id="orderForm">
+
+<div class="section">
+<label>📅 Día del Menú:</label>
+<select id="diaSemana" onchange="actualizarMenu()">
+<option>Lunes</option>
+<option>Martes</option>
+<option>Miércoles</option>
+<option>Jueves</option>
+<option>Viernes</option>
+<option>Sábado</option>
+</select>
+
+<label>🍲 Plato Principal:</label>
+<select id="platoSeleccionado"></select>
+</div>
+
+<div class="section">
+<label>➕ Adicionales:</label>
+<label class="extra-item"><input type="checkbox" value="2000" onchange="calcularTotal()"> Aguacate (+$2.000)</label>
+<label class="extra-item"><input type="checkbox" value="1500" onchange="calcularTotal()"> Huevo Frito (+$1.500)</label>
+
+<label>🥤 Bebida:</label>
+<select id="bebida" onchange="calcularTotal()">
+<option value="0">Jugo del día (Incluido)</option>
+<option value="2500">Limonada (+$2.500)</option>
+<option value="3000">Gaseosa (+$3.000)</option>
+</select>
+
+<div class="total-box">
+💰 Total: $<span id="total">12000</span>
+</div>
+</div>
+
+<div class="section">
+<label>👤 Datos de Envío:</label>
+<input type="text" id="nombre" placeholder="Nombre completo" required>
+<input type="text" id="direccion" placeholder="Ej: Calle 10 # 5-20" required>
+<textarea id="notas" rows="2" placeholder="Notas adicionales..."></textarea>
+</div>
+
+<button type="button" class="btn-order" onclick="enviarWhatsApp()">🚀 Enviar Pedido</button>
+
+</form>
+</div>
+
+<script>
+const precioBase = 12000;
+
+const menus={
+"Lunes":["Frijoles con Garra","Pollo al Horno"],
+"Martes":["Carne en Salsa","Pescado Apanado"],
+"Miércoles":["Ajiaco Santafereño","Cerdo Grillé"],
+"Jueves":["Sancocho de Pollo","Arroz Mixto"],
+"Viernes":["Bandeja Paisa","Sobrebarriga"],
+"Sábado":["Especial Parrilla","Sancocho de Gallina"]
+};
+
+function inicializarApp(){
+    const hoy=new Date();
+
+    // Mostrar fecha bonita
+    const opciones={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+    let fecha=hoy.toLocaleDateString('es-ES',opciones);
+    fecha=fecha.charAt(0).toUpperCase()+fecha.slice(1);
+    document.getElementById('fechaHoy').innerText="Hoy es "+fecha;
+
+    // Detectar día real
+    const diasSemana=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    let diaReal=diasSemana[hoy.getDay()];
+
+    // Si es domingo → mostrar lunes
+    if(diaReal==="Domingo"){ diaReal="Lunes"; }
+
+    document.getElementById('diaSemana').value=diaReal;
+
+    actualizarMenu();
+    calcularTotal();
+
+    // === CARGAR SOLO NOMBRE Y DIRECCIÓN ===
+    if(localStorage.getItem("nombre")){
+        document.getElementById("nombre").value=localStorage.getItem("nombre");
+    }
+    if(localStorage.getItem("direccion")){
+        document.getElementById("direccion").value=localStorage.getItem("direccion");
+    }
+}
+
+function actualizarMenu(){
+    const dia=document.getElementById('diaSemana').value;
+    const select=document.getElementById('platoSeleccionado');
+    select.innerHTML="";
+
+    menus[dia].forEach(p=>{
+        let opt=document.createElement('option');
+        opt.text=p;
+        select.add(opt);
+    });
+}
+
+function calcularTotal(){
+    let total=precioBase;
+
+    document.querySelectorAll('input[type="checkbox"]:checked')
+    .forEach(e=> total+=parseInt(e.value));
+
+    total+=parseInt(document.getElementById('bebida').value);
+
+    document.getElementById('total').innerText=total.toLocaleString();
+}
+
+function enviarWhatsApp(){
+    const nombre=document.getElementById('nombre').value;
+    const direccion=document.getElementById('direccion').value;
+
+    if(!nombre||!direccion){
+        alert("Completa nombre y dirección");
+        return;
+    }
+
+    // === GUARDAR SOLO NOMBRE Y DIRECCIÓN ===
+    localStorage.setItem("nombre",nombre);
+    localStorage.setItem("direccion",direccion);
+
+    const dia=document.getElementById('diaSemana').value;
+    const plato=document.getElementById('platoSeleccionado').value;
+    const bebida=document.getElementById('bebida').options[document.getElementById('bebida').selectedIndex].text;
+    const notas=document.getElementById('notas').value||"Ninguna";
+    const total=document.getElementById('total').innerText;
+
+    let mensaje=`*NUEVO PEDIDO*\n\n`;
+    mensaje+=`📅 Día: ${dia}\n`;
+    mensaje+=`👤 Cliente: ${nombre}\n`;
+    mensaje+=`🍲 Plato: ${plato}\n`;
+    mensaje+=`🥤 Bebida: ${bebida}\n`;
+    mensaje+=`🏠 Dirección: ${direccion}\n`;
+    mensaje+=`💰 Total: $${total}\n`;
+    mensaje+=`📝 Notas: ${notas}`;
+
+    const url=`https://wa.me/573143996019?text=${encodeURIComponent(mensaje)}`;
+
+    window.open(url,'_blank');
+}
+</script>
+
+</body>
+</html>
