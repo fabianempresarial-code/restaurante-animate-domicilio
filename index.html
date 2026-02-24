@@ -229,10 +229,8 @@ function inicializarApp(){
     }
     if(localStorage.getItem("bebida")){
         document.getElementById("bebida").value=localStorage.getItem("bebida");
-    }
-    if(localStorage.getItem("diaSeleccionado")){
-        document.getElementById("diaSemana").value=localStorage.getItem("diaSeleccionado");
-        actualizarMenu();
+  
+
     }
 
     calcularTotal();
@@ -250,7 +248,7 @@ function actualizarMenu(){
     });
 
     // Guardar día seleccionado
-    localStorage.setItem("diaSeleccionado",dia);
+   
 }
 
 function calcularTotal(){
@@ -305,4 +303,5 @@ function enviarWhatsApp(){
 </script>
 
 </body>
-</html>
+</html
+  
