@@ -80,7 +80,7 @@ input,select,textarea{
     border:none;
     border-radius:10px;
     margin-bottom:10px;
-    font-size:14px;
+    font-size:15px;
     outline:none;
     transition:0.3s;
 }
@@ -90,11 +90,11 @@ input:focus,select:focus,textarea:focus{
     transform:scale(1.02);
 }
 
-.extra-item{font-size:13px;margin-bottom:5px;}
+.extra-item{font-size:13px;margin-bottom:10px;}
 
 .total-box{
     text-align:center;
-    font-size:18px;
+    font-size:21px;
     font-weight:700;
     margin-top:10px;
 }
@@ -158,7 +158,8 @@ input:focus,select:focus,textarea:focus{
 
 <div class="section">
 <label>➕ Adicionales:</label>
-<label class="extra-item"><input type="checkbox" value="2000" onchange="calcularTotal()"> Aguacate (+$2.000)</label>
+<label class="extra-item"><input type="checkbox" value="2000" onchange="calcularTotal()"> Fruta (+$2.000)</label>
+  
 <label class="extra-item"><input type="checkbox" value="1500" onchange="calcularTotal()"> Huevo Frito (+$1.500)</label>
 
 <label>🥤 Bebida:</label>
@@ -169,7 +170,7 @@ input:focus,select:focus,textarea:focus{
 </select>
 
 <div class="total-box">
-💰 Total: $<span id="total">12000</span>
+💰 Total Domicilio: $<span id="total">12000</span>
 </div>
 </div>
 
@@ -186,7 +187,7 @@ input:focus,select:focus,textarea:focus{
 </div>
 
 <script>
-const precioBase = 12000;
+const precioBase = 15500 ;
 
 const menus={
 "Lunes":["Frijoles con Garra","Pollo al Horno"],
