@@ -200,13 +200,13 @@ const menus={
 function inicializarApp(){
     const hoy=new Date();
 
-    // Mostrar fecha bonita
+    // === FORMATO FECHA BONITA ===
     const opciones={weekday:'long',year:'numeric',month:'long',day:'numeric'};
     let fecha=hoy.toLocaleDateString('es-ES',opciones);
     fecha=fecha.charAt(0).toUpperCase()+fecha.slice(1);
     document.getElementById('fechaHoy').innerText="Hoy es "+fecha;
 
-    // Detectar día real
+    // === DETECTAR DIA REAL ===
     const diasSemana=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
     let diaReal=diasSemana[hoy.getDay()];
 
@@ -216,15 +216,26 @@ function inicializarApp(){
     document.getElementById('diaSemana').value=diaReal;
 
     actualizarMenu();
-    calcularTotal();
 
-    // === CARGAR SOLO NOMBRE Y DIRECCIÓN ===
+    // === CARGAR DATOS GUARDADOS ===
     if(localStorage.getItem("nombre")){
         document.getElementById("nombre").value=localStorage.getItem("nombre");
     }
     if(localStorage.getItem("direccion")){
         document.getElementById("direccion").value=localStorage.getItem("direccion");
     }
+    if(localStorage.getItem("notas")){
+        document.getElementById("notas").value=localStorage.getItem("notas");
+    }
+    if(localStorage.getItem("bebida")){
+        document.getElementById("bebida").value=localStorage.getItem("bebida");
+    }
+    if(localStorage.getItem("diaSeleccionado")){
+        document.getElementById("diaSemana").value=localStorage.getItem("diaSeleccionado");
+        actualizarMenu();
+    }
+
+    calcularTotal();
 }
 
 function actualizarMenu(){
@@ -237,6 +248,9 @@ function actualizarMenu(){
         opt.text=p;
         select.add(opt);
     });
+
+    // Guardar día seleccionado
+    localStorage.setItem("diaSeleccionado",dia);
 }
 
 function calcularTotal(){
@@ -259,15 +273,17 @@ function enviarWhatsApp(){
         return;
     }
 
-    // === GUARDAR SOLO NOMBRE Y DIRECCIÓN ===
-    localStorage.setItem("nombre",nombre);
-    localStorage.setItem("direccion",direccion);
-
     const dia=document.getElementById('diaSemana').value;
     const plato=document.getElementById('platoSeleccionado').value;
     const bebida=document.getElementById('bebida').options[document.getElementById('bebida').selectedIndex].text;
     const notas=document.getElementById('notas').value||"Ninguna";
     const total=document.getElementById('total').innerText;
+
+    // === GUARDAR DATOS AUTOMÁTICAMENTE ===
+    localStorage.setItem("nombre",nombre);
+    localStorage.setItem("direccion",direccion);
+    localStorage.setItem("notas",notas);
+    localStorage.setItem("bebida",document.getElementById("bebida").value);
 
     let mensaje=`*NUEVO PEDIDO*\n\n`;
     mensaje+=`📅 Día: ${dia}\n`;
@@ -280,7 +296,11 @@ function enviarWhatsApp(){
 
     const url=`https://wa.me/573143996019?text=${encodeURIComponent(mensaje)}`;
 
-    window.open(url,'_blank');
+    document.querySelector('.btn-order').innerText="Enviando...";
+    setTimeout(()=>{
+        window.open(url,'_blank');
+        document.querySelector('.btn-order').innerText="🚀 Enviar Pedido";
+    },1200);
 }
 </script>
 
