@@ -132,18 +132,41 @@
 
 <script>
 // === 1. CONFIGURACIÓN FIREBASE (REEMPLAZA ESTO) ===
+web
+Sobrenombre de la app
+Restaurante-menu
+ID de la app
+1:493063436194:web:0ca48049cf9022816a24fb
+Configuración del SDK
+
+npm
+
+CDN
+
+Config
+Si ya usas npm y un agrupador de módulos como Webpack o Rollup, puedes ejecutar el siguiente comando para instalar la versión más reciente del SDK (más información):
+
+npm install firebase
+Luego, inicializa Firebase y comienza a usar los SDK de los productos que quieres utilizar.
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCxHaPA9rHQYx4SCqALE5_8wsxmo7_tUfo",
-  authDomain: "prueba-record-d6d5c.firebaseapp.com",
-  databaseURL: "https://prueba-record-d6d5c-default-rtdb.firebaseio.com",
-  projectId: "prueba-record-d6d5c",
-  storageBucket: "prueba-record-d6d5c.firebasestorage.app",
-  messagingSenderId: "423784204085",
-  appId: "1:423784204085:web:c2b2fe61aa9766c0d2ee7c"
+  apiKey: "AIzaSyBYX3jSSilzeExkkV3NDEZAlXJoNqWouw4",
+  authDomain: "restaurante-menu-dadcc.firebaseapp.com",
+  databaseURL: "https://restaurante-menu-dadcc-default-rtdb.firebaseio.com",
+  projectId: "restaurante-menu-dadcc",
+  storageBucket: "restaurante-menu-dadcc.firebasestorage.app",
+  messagingSenderId: "493063436194",
+  appId: "1:493063436194:web:0ca48049cf9022816a24fb"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 
 // === 2. VARIABLES GLOBALES ===
 const PRECIO_BASE = 15500;
