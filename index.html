@@ -6,19 +6,19 @@
     <title>Restaurante Gourmet - Pedidos</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
     <style>
         :root{
             --primary:#ff7a18;
             --secondary:#ffb347;
             --whatsapp:#25d366;
-            --admin:#4a90e2;
+            --admin-color: #007bff;
             --glass:rgba(255,255,255,0.15);
         }
 
-        *{box-sizing:border-box; margin:0; padding:0;}
+        *{box-sizing:border-box;margin:0;padding:0;}
 
         body{
             font-family:'Poppins',sans-serif;
@@ -36,7 +36,7 @@
 
         .container{
             width:100%;
-            max-width:500px;
+            max-width:520px;
             backdrop-filter:blur(20px);
             background:var(--glass);
             border-radius:25px;
@@ -45,214 +45,307 @@
             color:white;
         }
 
-        .header-logo{text-align:center; margin-bottom:15px; position: relative;}
-        .header-logo img{width:120px; border-radius:15px; margin-bottom:10px;}
-        
-        h2{ font-weight:700; background:linear-gradient(45deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-        
-        .badge{ display:inline-block; background:rgba(255,255,255,0.2); padding:5px 12px; border-radius:20px; font-size:12px; margin-top:5px;}
+        .header-logo{text-align:center;margin-bottom:15px;}
+        .header-logo img{width:150px;border-radius:15px;}
 
-        .section{ margin-bottom:15px; padding:15px; border-radius:15px; background:rgba(255,255,255,0.1); }
-        
-        label{ font-size:13px; font-weight:600; margin-bottom:5px; display:block; color: var(--secondary); }
+        h2{
+            margin:10px 0;
+            font-weight:700;
+            background:linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+        }
+
+        .badge{
+            display:inline-block;
+            background:rgba(255,255,255,0.2);
+            padding:6px 15px;
+            border-radius:20px;
+            font-size:13px;
+            margin-bottom: 10px;
+        }
+
+        .section{
+            margin-bottom:15px;
+            padding:15px;
+            border-radius:15px;
+            background:rgba(255,255,255,0.1);
+        }
+
+        label{font-size:14px;font-weight:600;margin-bottom:5px;display:block;}
 
         input, select, textarea {
-            width:100%; padding:10px; border:none; border-radius:10px; margin-bottom:10px; font-size:14px; outline:none;
+            width:100%;
+            padding:10px;
+            border:none;
+            border-radius:10px;
+            margin-bottom:10px;
+            font-size:15px;
+            outline:none;
         }
 
-        .total-box{ text-align:center; font-size:22px; font-weight:700; margin:15px 0; color: #fff; }
+        .extra-item{font-size:14px; display: flex; align-items: center; gap: 10px; cursor: pointer;}
+        .extra-item input { width: auto; margin: 0; }
+
+        .total-box{
+            text-align:center;
+            font-size:22px;
+            font-weight:700;
+            margin-top:15px;
+            padding: 10px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
 
         .btn-order{
-            width:100%; background:var(--whatsapp); border:none; padding:15px; font-size:16px;
-            font-weight:700; color:white; border-radius:15px; cursor:pointer; transition:0.3s;
+            width:100%;
+            background:var(--whatsapp);
+            border:none;
+            padding:15px;
+            font-size:16px;
+            font-weight:700;
+            color:white;
+            border-radius:15px;
+            cursor:pointer;
+            transition:0.3s;
         }
 
-        /* Admin Styles */
-        .btn-admin-gear { position: absolute; top: 0; right: 0; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; }
-        .admin-panel {
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 400px; background: #1a1a1a; padding: 25px; border-radius: 20px;
-            z-index: 1000; max-height: 80vh; overflow-y: auto; border: 2px solid var(--admin);
-        }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; }
-        .admin-day-row { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+        .btn-order:hover{ transform:scale(1.02); }
+
+        /* Estilos específicos para Admin */
+        .admin-input { background: #fff !important; color: #333 !important; margin-bottom: 5px !important; }
+        .admin-label { color: #ffb347; font-size: 12px; margin-top: 5px; }
     </style>
 </head>
+
 <body onload="inicializarApp()">
 
-<div class="container">
+<div class="container" id="mainContainer">
     <div class="header-logo">
-        <button class="btn-admin-gear" onclick="verificarAdmin()">⚙️</button>
-        <img src="https://i.imgur.com/3FvWdgi.gif">
-        <h2>Restaurante Gourmet</h2>
+        <img src="https://i.imgur.com/3FvWdgi.gif" alt="Logo">
+        <h2 id="tituloPrincipal">Restaurante Gourmet</h2>
         <span id="fechaHoy" class="badge"></span>
     </div>
 
-    <form id="orderForm">
-        <div class="section">
-            <label>📅 DÍA DEL MENÚ</label>
-            <select id="diaSemana" onchange="actualizarMenu()"></select>
-
-            <label>🍲 PLATO PRINCIPAL</label>
-            <select id="platoSeleccionado"></select>
-        </div>
-
-        <div class="section">
-            <label>➕ ADICIONALES</label>
-            <label style="color:white; font-weight:normal;"><input type="checkbox" value="2000" onchange="calcularTotal()" style="width:auto;"> Fruta (+$2.000)</label>
-            <label style="color:white; font-weight:normal;"><input type="checkbox" value="1500" onchange="calcularTotal()" style="width:auto;"> Huevo Frito (+$1.500)</label>
-
-            <label style="margin-top:10px;">🥤 BEBIDA</label>
-            <select id="bebida" onchange="calcularTotal()">
-                <option value="0">Jugo del día (Incluido)</option>
-                <option value="2500">Limonada (+$2.500)</option>
-                <option value="3000">Gaseosa (+$3.000)</option>
-            </select>
-        </div>
-
-        <div class="total-box">💰 Total: $<span id="total">15,500</span></div>
-
-        <div class="section">
-            <label>👤 DATOS DE ENVÍO</label>
-            <input type="text" id="nombre" placeholder="Tu nombre" required>
-            <input type="text" id="direccion" placeholder="Dirección completa" required>
-            <textarea id="notas" rows="2" placeholder="Notas (Ej: Sin cebolla)"></textarea>
-        </div>
-
-        <button type="button" class="btn-order" onclick="enviarWhatsApp()">🚀 ENVIAR PEDIDO</button>
-    </form>
-</div>
-
-<div id="overlay" class="overlay" onclick="cerrarAdmin()"></div>
-<div id="adminPanel" class="admin-panel">
-    <h3 style="color:var(--admin); margin-bottom:15px;">Panel Administrador</h3>
-    <div id="adminInputs"></div>
-    <button onclick="guardarMenuAdmin()" style="width:100%; padding:12px; background:var(--admin); border:none; color:white; border-radius:10px; font-weight:bold; cursor:pointer;">💾 Guardar Cambios</button>
+    <div id="appContent">Cargando menú...</div>
 </div>
 
 <script>
-// === 1. CONFIGURACIÓN FIREBASE (REEMPLAZA ESTO) ===
+// 1. CONFIGURACIÓN FIREBASE
 const firebaseConfig = {
-  apiKey: "AIzaSyBYX3jSSilzeExkkV3NDEZAlXJoNqWouw4",
-  authDomain: "restaurante-menu-dadcc.firebaseapp.com",
-  databaseURL: "https://restaurante-menu-dadcc-default-rtdb.firebaseio.com",
-  projectId: "restaurante-menu-dadcc",
-  storageBucket: "restaurante-menu-dadcc.firebasestorage.app",
-  messagingSenderId: "493063436194",
-  appId: "1:493063436194:web:0ca48049cf9022816a24fb"
+    databaseURL: "TU_URL_DE_FIREBASE_AQUI" 
 };
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Variables de Estado
+let menusGlobal = {};
+let preciosGlobal = {};
+const urlParams = new URLSearchParams(window.location.search);
+const isAdmin = urlParams.get('admin') === 'true';
 
-
-// === 2. VARIABLES GLOBALES ===
-const PRECIO_BASE = 15500;
-const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-let menus = {
-    "Lunes": ["Cargando...", "..."], "Martes": ["Cargando...", "..."], "Miércoles": ["Cargando...", "..."],
-    "Jueves": ["Cargando...", "..."], "Viernes": ["Cargando...", "..."], "Sábado": ["Cargando...", "..."]
-};
-
-// === 3. INICIO DE APP ===
+// 2. INICIALIZACIÓN
 function inicializarApp() {
-    const selectDia = document.getElementById('diaSemana');
-    DIAS.forEach(d => {
-        let opt = document.createElement('option');
-        opt.text = d;
-        selectDia.add(opt);
-    });
-
-    // Detectar día actual
-    const hoy = new Date();
-    const diaReal = DIAS[hoy.getDay() - 1] || "Lunes";
-    selectDia.value = diaReal;
-    
-    document.getElementById('fechaHoy').innerText = hoy.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'});
-
-    // Cargar datos guardados del usuario (Delivery Info)
-    document.getElementById("nombre").value = localStorage.getItem("nombre") || "";
-    document.getElementById("direccion").value = localStorage.getItem("direccion") || "";
-
-    // CONECTAR A FIREBASE
-    db.ref('menuSemanal').on('value', (snapshot) => {
-        if (snapshot.exists()) {
-            menus = snapshot.val();
-            actualizarMenu();
+    db.ref().on('value', (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            menusGlobal = data.menuSemanal;
+            preciosGlobal = data.preciosConfig;
+            renderizarInterfaz();
         }
     });
+}
 
+function renderizarInterfaz() {
+    const content = document.getElementById('appContent');
+    
+    if (isAdmin) {
+        renderAdmin(content);
+    } else {
+        renderCliente(content);
+    }
+}
+
+// 3. VISTA DEL CLIENTE
+function renderCliente(container) {
+    const hoy = new Date();
+    const diasSemana = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+    let diaSugerido = diasSemana[hoy.getDay()] === "Domingo" ? "Lunes" : diasSemana[hoy.getDay()];
+
+    container.innerHTML = `
+        <form id="orderForm">
+            <div class="section">
+                <label>📅 Día del Menú:</label>
+                <select id="diaSemana" onchange="actualizarPlatosCliente()">
+                    <option ${diaSugerido==='Lunes'?'selected':''}>Lunes</option>
+                    <option ${diaSugerido==='Martes'?'selected':''}>Martes</option>
+                    <option ${diaSugerido==='Miércoles'?'selected':''}>Miércoles</option>
+                    <option ${diaSugerido==='Jueves'?'selected':''}>Jueves</option>
+                    <option ${diaSugerido==='Viernes'?'selected':''}>Viernes</option>
+                    <option ${diaSugerido==='Sábado'?'selected':''}>Sábado</option>
+                </select>
+
+                <label>🍲 Plato Principal:</label>
+                <select id="platoSeleccionado"></select>
+            </div>
+
+            <div class="section">
+                <label>➕ Adicionales:</label>
+                <label class="extra-item">
+                    <input type="checkbox" id="chkFruta" onchange="calcularTotal()"> 
+                    <span id="txtFruta">Fruta (+$${preciosGlobal.fruta})</span>
+                </label>
+                <label class="extra-item">
+                    <input type="checkbox" id="chkHuevo" onchange="calcularTotal()"> 
+                    <span id="txtHuevo">Huevo Frito (+$${preciosGlobal.huevo})</span>
+                </label>
+
+                <label style="margin-top:10px;">🥤 Bebida:</label>
+                <select id="bebida" onchange="calcularTotal()">
+                    <option value="0">Jugo del día (Incluido)</option>
+                    <option value="${preciosGlobal.limonada}">Limonada (+$${preciosGlobal.limonada.toLocaleString()})</option>
+                    <option value="${preciosGlobal.gaseosa}">Gaseosa (+$${preciosGlobal.gaseosa.toLocaleString()})</option>
+                </select>
+
+                <div class="total-box">
+                    💰 Total: $<span id="total">0</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <label>👤 Datos de Envío:</label>
+                <input type="text" id="nombre" placeholder="Nombre completo" required>
+                <input type="text" id="direccion" placeholder="Ej: Calle 10 # 5-20" required>
+                <textarea id="notas" rows="2" placeholder="Notas (sin cebolla, etc...)"></textarea>
+            </div>
+
+            <button type="button" class="btn-order" onclick="enviarWhatsApp()">🚀 Enviar Pedido</button>
+        </form>
+    `;
+
+    // Cargar persistencia de LocalStorage
+    if(localStorage.getItem("nombre")) document.getElementById("nombre").value = localStorage.getItem("nombre");
+    if(localStorage.getItem("direccion")) document.getElementById("direccion").value = localStorage.getItem("direccion");
+
+    actualizarPlatosCliente();
+}
+
+function actualizarPlatosCliente() {
+    const dia = document.getElementById('diaSemana').value;
+    const select = document.getElementById('platoSeleccionado');
+    select.innerHTML = "";
+    (menusGlobal[dia] || []).forEach(p => {
+        let opt = document.createElement('option');
+        opt.text = p;
+        select.add(opt);
+    });
     calcularTotal();
 }
 
-function actualizarMenu() {
-    const dia = document.getElementById('diaSemana').value;
-    const selectPlato = document.getElementById('platoSeleccionado');
-    selectPlato.innerHTML = "";
-    menus[dia].forEach(p => {
-        let opt = document.createElement('option');
-        opt.text = p;
-        selectPlato.add(opt);
-    });
-}
-
 function calcularTotal() {
-    let total = PRECIO_BASE;
-    document.querySelectorAll('input[type="checkbox"]:checked').forEach(e => total += parseInt(e.value));
+    let total = preciosGlobal.base;
+    if(document.getElementById('chkFruta').checked) total += preciosGlobal.fruta;
+    if(document.getElementById('chkHuevo').checked) total += preciosGlobal.huevo;
     total += parseInt(document.getElementById('bebida').value);
     document.getElementById('total').innerText = total.toLocaleString();
 }
 
-// === 4. LÓGICA ADMIN ===
-function verificarAdmin() {
-    if (prompt("Clave de acceso:") === "1234") {
-        const container = document.getElementById('adminInputs');
-        container.innerHTML = "";
-        DIAS.forEach(dia => {
-            const div = document.createElement('div');
-            div.className = "admin-day-row";
-            div.innerHTML = `<label>${dia}</label>
-                <input type="text" id="adm-${dia}-0" value="${menus[dia][0]}">
-                <input type="text" id="adm-${dia}-1" value="${menus[dia][1]}">`;
-            container.appendChild(div);
-        });
-        document.getElementById('adminPanel').style.display = "block";
-        document.getElementById('overlay').style.display = "block";
-    }
+// 4. VISTA DEL ADMINISTRADOR
+function renderAdmin(container) {
+    document.getElementById('tituloPrincipal').innerText = "Panel Administrador";
+    
+    let html = `
+        <div class="section" style="background: rgba(0,123,255,0.2)">
+            <label>💰 PRECIOS GLOBALES</label>
+            <span class="admin-label">Precio Almuerzo Base ($):</span>
+            <input type="number" id="admBase" class="admin-input" value="${preciosGlobal.base}">
+            <span class="admin-label">Adicional Fruta ($):</span>
+            <input type="number" id="admFruta" class="admin-input" value="${preciosGlobal.fruta}">
+            <span class="admin-label">Adicional Huevo ($):</span>
+            <input type="number" id="admHuevo" class="admin-input" value="${preciosGlobal.huevo}">
+            <span class="admin-label">Precio Limonada ($):</span>
+            <input type="number" id="admLim" class="admin-input" value="${preciosGlobal.limonada}">
+            <span class="admin-label">Precio Gaseosa ($):</span>
+            <input type="number" id="admGas" class="admin-input" value="${preciosGlobal.gaseosa}">
+        </div>
+        <div class="section">
+            <label>🍲 MENÚ DE LA SEMANA</label>
+    `;
+
+    ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"].forEach(dia => {
+        html += `
+            <div style="margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1)">
+                <span style="font-weight:bold; color:var(--secondary)">${dia}</span>
+                <input type="text" id="m1_${dia}" class="admin-input" value="${menusGlobal[dia][0]}">
+                <input type="text" id="m2_${dia}" class="admin-input" value="${menusGlobal[dia][1]}">
+            </div>
+        `;
+    });
+
+    html += `
+        </div>
+        <button class="btn-order" onclick="guardarCambiosAdmin()" style="background:var(--admin-color)">💾 GUARDAR CAMBIOS</button>
+        <button onclick="window.location.href='index.html'" style="width:100%; background:none; border:none; color:white; margin-top:15px; cursor:pointer">Ver como cliente</button>
+    `;
+    
+    container.innerHTML = html;
 }
 
-function guardarMenuAdmin() {
-    const nuevoMenu = {};
-    DIAS.forEach(dia => {
-        nuevoMenu[dia] = [
-            document.getElementById(`adm-${dia}-0`).value,
-            document.getElementById(`adm-${dia}-1`).value
+function guardarCambiosAdmin() {
+    const nuevosPrecios = {
+        base: parseInt(document.getElementById('admBase').value),
+        fruta: parseInt(document.getElementById('admFruta').value),
+        huevo: parseInt(document.getElementById('admHuevo').value),
+        limonada: parseInt(document.getElementById('admLim').value),
+        gaseosa: parseInt(document.getElementById('admGas').value)
+    };
+
+    const nuevosMenus = {};
+    ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"].forEach(dia => {
+        nuevosMenus[dia] = [
+            document.getElementById(`m1_${dia}`).value,
+            document.getElementById(`m2_${dia}`).value
         ];
     });
-    db.ref('menuSemanal').set(nuevoMenu).then(() => {
-        alert("¡Menú actualizado globalmente!");
-        cerrarAdmin();
-    });
+
+    db.ref().set({
+        preciosConfig: nuevosPrecios,
+        menuSemanal: nuevosMenus
+    }).then(() => alert("✅ ¡Todo actualizado para todos los usuarios!"));
 }
 
-function cerrarAdmin() {
-    document.getElementById('adminPanel').style.display = "none";
-    document.getElementById('overlay').style.display = "none";
-}
-
-// === 5. WHATSAPP ===
+// 5. ENVÍO DE WHATSAPP
 function enviarWhatsApp() {
-    const nom = document.getElementById('nombre').value;
-    const dir = document.getElementById('direccion').value;
-    if(!nom || !dir) return alert("Faltan datos de envío");
+    const nombre = document.getElementById('nombre').value;
+    const direccion = document.getElementById('direccion').value;
 
-    localStorage.setItem("nombre", nom);
-    localStorage.setItem("direccion", dir);
+    if(!nombre || !direccion) {
+        alert("Por favor llena tu nombre y dirección");
+        return;
+    }
 
-    const msj = `*NUEVO PEDIDO*\n\n👤 *Cliente:* ${nom}\n🏠 *Dir:* ${dir}\n🍲 *Plato:* ${document.getElementById('platoSeleccionado').value}\n🥤 *Bebida:* ${document.getElementById('bebida').options[document.getElementById('bebida').selectedIndex].text}\n💰 *Total:* $${document.getElementById('total').innerText}\n📝 *Notas:* ${document.getElementById('notas').value || 'Ninguna'}`;
-    
-    window.open(`https://wa.me/573143996019?text=${encodeURIComponent(msj)}`, '_blank');
+    // Guardar para la próxima vez
+    localStorage.setItem("nombre", nombre);
+    localStorage.setItem("direccion", direccion);
+
+    const dia = document.getElementById('diaSemana').value;
+    const plato = document.getElementById('platoSeleccionado').value;
+    const bebida = document.getElementById('bebida').options[document.getElementById('bebida').selectedIndex].text;
+    const notas = document.getElementById('notas').value || "Ninguna";
+    const total = document.getElementById('total').innerText;
+
+    let mensaje = `*NUEVO PEDIDO*\n\n`;
+    mensaje += `📅 *Día:* ${dia}\n`;
+    mensaje += `👤 *Cliente:* ${nombre}\n`;
+    mensaje += `🍲 *Plato:* ${plato}\n`;
+    mensaje += `🥤 *Bebida:* ${bebida}\n`;
+    mensaje += `🏠 *Dirección:* ${direccion}\n`;
+    mensaje += `💰 *Total:* $${total}\n`;
+    mensaje += `📝 *Notas:* ${notas}`;
+
+    const url = `https://wa.me/573143996019?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
 }
 </script>
+
 </body>
 </html>
