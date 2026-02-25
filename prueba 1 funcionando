@@ -1,1 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Online - Versión Pro</title>
+    <style>
+      
+        :root { --primary: #e67e22; --whatsapp: #25d366; --bg: #f4f7f9; }
+        body { font-family: 'Segoe UI', sans-serif; background-image: url('https://i.imgur.com/UOPlh0M.jpeg'); background-size: cover; background-repeat: no-repeat;">; padding: 10px; color: #800000; }
+        .container { max-width: 480px; background: WHITE; padding: 50px; border-radius: 50px; margin: auto; box-shadow: 0 30px 10px rgba(0,0,0,0.1); }
+        .header-logo { text-align: center; margin-bottom: 70px; }
+        .header-logo img { max-width: 300px; height: auto; border-radius: 15px; }
+        h2 { color: var(--primary); text-align: center; margin: 10px 0; }
+        .badge { background: #fff3e0; color: #e65100; padding: 6px 15px; border-radius: 20px; font-size: 0.85em; font-weight: bold; display: inline-block; }
+        .section { margin-bottom: 18px; padding: 15px; background: #fafafa; border-radius: 15px; border: 1px solid #f0f0f0; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.9em; }
+        select, input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 15px; margin-bottom: 10px; }
+        .extra-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #eee; font-size: 0.9em; cursor: pointer; }
+        .btn-order { width: 100%; background: var(--whatsapp); color: white; border: none; padding: 18px; font-size: 18px; font-weight: bold; border-radius: 15px; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
+        .btn-order:hover { background: #1ebd5a; transform: translateY(-2px); }
+        .remember-me { font-size: 0.85em; display: flex; align-items: center; gap: 8px; color: #666; margin-top: 5px; cursor: pointer; }
+        .remember-me input { width: auto; margin: 0; }
+    </style>
+</head>
+<body onload="inicializarApp()">
+  
+    
 
+<div class="container">
+    <div class="header-logo">
+        <img src="https://i.imgur.com/3FvWdgi.gif" alt="Logotipo" id="mainLogo">
+        <h2>Restaurante Gourmet</h2>
+        <span id="fechaHoy" class="badge"></span>
+    </div>
+    
+    <form id="orderForm">
+        <div class="section">
+            <label>📅 Día del Menú:</label>
+            <select id="diaSemana" onchange="actualizarMenu()">
+                <option value="Lunes">Lunes</option>
+                <option value="Martes">Martes</option>
+                <option value="Miércoles">Miércoles</option>
+                <option value="Jueves">Jueves</option>
+                <option value="Viernes">Viernes</option>
+                <option value="Sábado">Sábado</option>
+            </select>
+            <label>🍲 Plato Principal:</label>
+            <select id="platoSeleccionado"></select>
+        </div>
+
+        <div class="section">
+            <label>➕ Adicionales:</label>
+            <label class="extra-item"><input type="checkbox" name="extra" value="Aguacate"> Porción Aguacate (+$2.000)</label>
+            <label class="extra-item"><input type="checkbox" name="extra" value="Huevo"> Huevo Frito (+$1.500)</label>
+            
+            <label style="margin-top:15px;">🥤 Bebida:</label>
+            <select id="bebida">
+                <option value="Jugo del día">Jugo del día (Incluido)</option>
+                <option value="Limonada (+2.500)">Limonada (+$2.500)</option>
+                <option value="Gaseosa (+3.000)">Gaseosa (+$3.000)</option>
+            </select>
+        </div>
+
+        <div class="section">
+            <label>👤 Datos de Envío:</label>
+            <input type="text" id="nombre" placeholder="Nombre completo" required>
+            <input type="text" id="direccion" placeholder="Ej: Calle 10 # 5-20" required>
+            
+            <label class="remember-me">
+                <input type="checkbox" id="recordarDatos" checked> Recordar mis datos
+            </label>
+            
+            <textarea id="notas" rows="2" placeholder="Notas adicionales..."></textarea>
+        </div>
+
+        <button type="button" class="btn-order" onclick="enviarWhatsApp()">🚀 Enviar Pedido por WhatsApp</button>
+    </form>
+</div>
+
+<script>
+    const menus = {
+        "Lunes": ["Frijoles con Garra", "Pollo al Horno"],
+        "Martes": ["Carne en Salsa", "Pescado Apanado"],
+        "Miércoles": ["Ajiaco Santafereño", "Cerdo Grillé"],
+        "Jueves": ["Sancocho de Pollo", "Arroz Mixto"],
+        "Viernes": ["Bandeja Paisa", "Sobrebarriga"],
+        "Sábado": ["Especial Parrilla", "Sancocho de Gallina"]
+    };
+
+    function inicializarApp() {
+        const hoy = new Date();
+        const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+        const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+let fechaLarga = hoy.toLocaleDateString('es-ES', opciones);
+
+// Convertir la primera letra a mayúscula para que se vea más profesional
+fechaLarga = fechaLarga.charAt(0).toUpperCase() + fechaLarga.slice(1);
+
+document.getElementById('fechaHoy').innerText = `Hoy es ${fechaLarga}`;
+
+const selectDia = document.getElementById('diaSemana');
+// Usamos el nombre del día (nombreDia) definido previamente o extraído de la fecha
+const nombreDia = hoy.toLocaleDateString('es-ES', { weekday: 'long' });
+const nombreDiaCapitalizado = nombreDia.charAt(0).toUpperCase() + nombreDia.slice(1);
+
+selectDia.value = (hoy.getDay() === 0) ? "Lunes" : nombreDiaCapitalizado;
+        
+        actualizarMenu();
+
+        // Cargar datos guardados
+        if (localStorage.getItem('u_nombre')) document.getElementById('nombre').value = localStorage.getItem('u_nombre');
+        if (localStorage.getItem('u_direccion')) document.getElementById('direccion').value = localStorage.getItem('u_direccion');
+    }
+
+    function actualizarMenu() {
+        const dia = document.getElementById('diaSemana').value;
+        const selectPlato = document.getElementById('platoSeleccionado');
+        selectPlato.innerHTML = '';
+        menus[dia].forEach(p => {
+            let opt = document.createElement('option');
+            opt.value = p; opt.text = p;
+            selectPlato.appendChild(opt);
+        });
+    }
+
+    function enviarWhatsApp() {
+        const nombre = document.getElementById('nombre').value;
+        const direccion = document.getElementById('direccion').value;
+        const dia = document.getElementById('diaSemana').value;
+        const plato = document.getElementById('platoSeleccionado').value;
+        const bebida = document.getElementById('bebida').value;
+        const notas = document.getElementById('notas').value || "Ninguna";
+        
+        if (!nombre || !direccion) {
+            alert("Completa nombre y dirección");
+            return;
+        }
+
+        // Guardar datos
+        if (document.getElementById('recordarDatos').checked) {
+            localStorage.setItem('u_nombre', nombre);
+            localStorage.setItem('u_direccion', direccion);
+        }
+
+        let extras = [];
+        document.querySelectorAll('input[name="extra"]:checked').forEach(e => extras.push(e.value));
+        const extrasTxt = extras.length > 0 ? extras.join(", ") : "Ninguno";
+
+        // --- SOLUCIÓN AL PROBLEMA DEL # ---
+        const textoMensaje = `*NUEVO PEDIDO: ${dia.toUpperCase()}*\n` +
+                             `--------------------------\n` +
+                             `👤 *Cliente:* ${nombre}\n` +
+                             `🍲 *Plato:* ${plato}\n` +
+                             `➕ *Extras:* ${extrasTxt}\n` +
+                             `🥤 *Bebida:* ${bebida}\n` +
+                             `🏠 *Dirección:* ${direccion}\n` +
+                             `💬 *Notas:* ${notas}\n` +
+                             `--------------------------`;
+
+        // encodeURIComponent convierte el # en %23 automáticamente
+        const urlWhatsApp = `https://wa.me/573143996019?text=${encodeURIComponent(textoMensaje)}`;
+        
+        window.open(urlWhatsApp, '_blank');
+    }
+</script>
+
+</body>
+</html>
