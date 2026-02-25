@@ -133,17 +133,18 @@
 <script>
 // === 1. CONFIGURACIÓN FIREBASE (REEMPLAZA ESTO) ===
 const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROYECTO.firebaseapp.com",
-    databaseURL: "https://TU_PROYECTO.firebaseio.com",
-    projectId: "TU_PROYECTO",
-    storageBucket: "TU_PROYECTO.appspot.com",
-    messagingSenderId: "TU_ID",
-    appId: "TU_APP_ID"
+  apiKey: "AIzaSyBYX3jSSilzeExkkV3NDEZAlXJoNqWouw4",
+  authDomain: "restaurante-menu-dadcc.firebaseapp.com",
+  databaseURL: "https://restaurante-menu-dadcc-default-rtdb.firebaseio.com",
+  projectId: "restaurante-menu-dadcc",
+  storageBucket: "restaurante-menu-dadcc.firebasestorage.app",
+  messagingSenderId: "493063436194",
+  appId: "1:493063436194:web:0ca48049cf9022816a24fb"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
 
 // === 2. VARIABLES GLOBALES ===
 const PRECIO_BASE = 15500;
