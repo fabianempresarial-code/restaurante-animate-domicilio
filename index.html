@@ -118,6 +118,15 @@ input:focus,select:focus,textarea:focus{
     box-shadow:0 10px 25px rgba(37,211,102,0.5);
 }
 
+.admin-btn{
+    margin-top:8px;
+    padding:6px 12px;
+    border-radius:10px;
+    border:none;
+    cursor:pointer;
+    font-size:13px;
+}
+
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -136,7 +145,8 @@ input:focus,select:focus,textarea:focus{
 <div class="header-logo">
 <img src="https://i.imgur.com/3FvWdgi.gif">
 <h2>Restaurante Gourmet</h2>
-<span id="fechaHoy" class="badge"></span>
+<span id="fechaHoy" class="badge"></span><br>
+<button class="admin-btn" onclick="activarAdmin()">⚙ Admin</button>
 </div>
 
 <form id="orderForm">
@@ -159,7 +169,6 @@ input:focus,select:focus,textarea:focus{
 <div class="section">
 <label>➕ Adicionales:</label>
 <label class="extra-item"><input type="checkbox" value="2000" onchange="calcularTotal()"> Fruta (+$2.000)</label>
-  
 <label class="extra-item"><input type="checkbox" value="1500" onchange="calcularTotal()"> Huevo Frito (+$1.500)</label>
 
 <label>🥤 Bebida:</label>
@@ -170,7 +179,7 @@ input:focus,select:focus,textarea:focus{
 </select>
 
 <div class="total-box">
-💰 Total Domicilio: $<span id="total">12000</span>
+💰 Total Domicilio: $<span id="total">15500</span>
 </div>
 </div>
 
@@ -186,91 +195,76 @@ input:focus,select:focus,textarea:focus{
 </form>
 </div>
 
-<script>
-const precioBase = 15500 ;
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const menus={
-"Lunes":["Frijoles con Garra","Pollo al Horno"],
-"Martes":["Carne en Salsa","Pescado Apanado"],
-"Miércoles":["Ajiaco Santafereño","Cerdo Grillé"],
-"Jueves":["Sancocho de Pollo","Arroz Mixto"],
-"Viernes":["Bandeja Paisa","Sobrebarriga"],
-"Sábado":["Especial Parrilla","Sancocho de Gallina"]
+const firebaseConfig = {
+  apiKey: "AQUI_TU_API_KEY",
+  authDomain: "AQUI_TU_AUTH_DOMAIN",
+  projectId: "AQUI_TU_PROJECT_ID",
+  storageBucket: "AQUI_TU_BUCKET",
+  messagingSenderId: "AQUI_TU_ID",
+  appId: "AQUI_TU_APP_ID"
 };
 
-function inicializarApp(){
-    const hoy=new Date();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    // === FORMATO FECHA BONITA ===
+const precioBase = 15500;
+let menus = {};
+
+window.inicializarApp = function(){
+    const hoy=new Date();
     const opciones={weekday:'long',year:'numeric',month:'long',day:'numeric'};
     let fecha=hoy.toLocaleDateString('es-ES',opciones);
     fecha=fecha.charAt(0).toUpperCase()+fecha.slice(1);
     document.getElementById('fechaHoy').innerText="Hoy es "+fecha;
 
-    // === DETECTAR DIA REAL ===
     const diasSemana=["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
     let diaReal=diasSemana[hoy.getDay()];
-
-    // Si es domingo → mostrar lunes
     if(diaReal==="Domingo"){ diaReal="Lunes"; }
-
     document.getElementById('diaSemana').value=diaReal;
 
-    actualizarMenu();
-
-    // === CARGAR DATOS GUARDADOS ===
-    if(localStorage.getItem("nombre")){
-        document.getElementById("nombre").value=localStorage.getItem("nombre");
-    }
-    if(localStorage.getItem("direccion")){
-        document.getElementById("direccion").value=localStorage.getItem("direccion");
-    }
-    if(localStorage.getItem("notas")){
-        document.getElementById("notas").value=localStorage.getItem("notas");
-    }
-    if(localStorage.getItem("bebida")){
-        document.getElementById("bebida").value=localStorage.getItem("bebida");
-  
-
-    }
-
+    cargarMenus();
     calcularTotal();
 }
 
-function actualizarMenu(){
+function cargarMenus(){
+    const ref = doc(db,"configuracion","menuSemanal");
+    onSnapshot(ref,(snapshot)=>{
+        if(snapshot.exists()){
+            menus=snapshot.data();
+            actualizarMenu();
+        }
+    });
+}
+
+window.actualizarMenu = function(){
     const dia=document.getElementById('diaSemana').value;
     const select=document.getElementById('platoSeleccionado');
     select.innerHTML="";
-
+    if(!menus[dia]) return;
     menus[dia].forEach(p=>{
         let opt=document.createElement('option');
-        opt.text=p;
+        opt.text=p.trim();
         select.add(opt);
     });
-
-    // Guardar día seleccionado
-   
 }
 
-function calcularTotal(){
+window.calcularTotal = function(){
     let total=precioBase;
-
     document.querySelectorAll('input[type="checkbox"]:checked')
     .forEach(e=> total+=parseInt(e.value));
-
     total+=parseInt(document.getElementById('bebida').value);
-
     document.getElementById('total').innerText=total.toLocaleString();
 }
 
-function enviarWhatsApp(){
+window.enviarWhatsApp = function(){
     const nombre=document.getElementById('nombre').value;
     const direccion=document.getElementById('direccion').value;
-
-    if(!nombre||!direccion){
-        alert("Completa nombre y dirección");
-        return;
-    }
+    if(!nombre||!direccion){ alert("Completa nombre y dirección"); return; }
 
     const dia=document.getElementById('diaSemana').value;
     const plato=document.getElementById('platoSeleccionado').value;
@@ -278,31 +272,26 @@ function enviarWhatsApp(){
     const notas=document.getElementById('notas').value||"Ninguna";
     const total=document.getElementById('total').innerText;
 
-    // === GUARDAR DATOS AUTOMÁTICAMENTE ===
-    localStorage.setItem("nombre",nombre);
-    localStorage.setItem("direccion",direccion);
-    localStorage.setItem("notas",notas);
-    localStorage.setItem("bebida",document.getElementById("bebida").value);
-
-    let mensaje=`*NUEVO PEDIDO*\n\n`;
-    mensaje+=`📅 Día: ${dia}\n`;
-    mensaje+=`👤 Cliente: ${nombre}\n`;
-    mensaje+=`🍲 Plato: ${plato}\n`;
-    mensaje+=`🥤 Bebida: ${bebida}\n`;
-    mensaje+=`🏠 Dirección: ${direccion}\n`;
-    mensaje+=`💰 Total: $${total}\n`;
-    mensaje+=`📝 Notas: ${notas}`;
+    let mensaje=`*NUEVO PEDIDO*\n\n📅 Día: ${dia}\n👤 Cliente: ${nombre}\n🍲 Plato: ${plato}\n🥤 Bebida: ${bebida}\n🏠 Dirección: ${direccion}\n💰 Total: $${total}\n📝 Notas: ${notas}`;
 
     const url=`https://wa.me/573143996019?text=${encodeURIComponent(mensaje)}`;
+    window.open(url,'_blank');
+}
 
-    document.querySelector('.btn-order').innerText="Enviando...";
-    setTimeout(()=>{
-        window.open(url,'_blank');
-        document.querySelector('.btn-order').innerText="🚀 Enviar Pedido";
-    },1200);
+window.activarAdmin = async function(){
+    const clave=prompt("Ingrese clave admin");
+    if(clave!=="1234"){ alert("Clave incorrecta"); return; }
+
+    let nuevoMenu={};
+    for(const dia of ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"]){
+        let platos=prompt(`Editar ${dia} (separar con coma)`,menus[dia]?.join(","));
+        if(platos) nuevoMenu[dia]=platos.split(",");
+    }
+
+    await setDoc(doc(db,"configuracion","menuSemanal"),nuevoMenu);
+    alert("Menú actualizado en todos los dispositivos ✅");
 }
 </script>
 
 </body>
-</html
-  
+</html>
