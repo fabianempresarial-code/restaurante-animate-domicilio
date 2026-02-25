@@ -1,231 +1,160 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pedido Online Pro - Admin Ready</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurante Gourmet - Pedidos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root{
+            --primary:#ff7a18;
+            --secondary:#ffb347;
+            --whatsapp:#25d366;
+            --admin:#4a90e2;
+            --glass:rgba(255,255,255,0.15);
+        }
 
-<style>
-:root{
-    --primary:#ff7a18;
-    --secondary:#ffb347;
-    --whatsapp:#25d366;
-    --admin:#4a90e2;
-    --glass:rgba(255,255,255,0.15);
-}
+        *{box-sizing:border-box; margin:0; padding:0;}
 
-*{box-sizing:border-box;margin:0;padding:0;}
+        body{
+            font-family:'Poppins',sans-serif;
+            background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
+                       url('https://i.imgur.com/UOPlh0M.jpeg');
+            background-size:cover;
+            background-position:center;
+            background-attachment: fixed;
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
+        }
 
-body{
-    font-family:'Poppins',sans-serif;
-    background:linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)),
-               url('https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop');
-    background-size:cover;
-    background-position:center;
-    background-attachment: fixed;
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
+        .container{
+            width:100%;
+            max-width:500px;
+            backdrop-filter:blur(20px);
+            background:var(--glass);
+            border-radius:25px;
+            padding:25px;
+            box-shadow:0 15px 40px rgba(0,0,0,0.4);
+            color:white;
+        }
 
-.container{
-    width:100%;
-    max-width:520px;
-    backdrop-filter:blur(20px);
-    background:var(--glass);
-    border-radius:25px;
-    padding:25px;
-    box-shadow:0 15px 40px rgba(0,0,0,0.4);
-    color:white;
-}
+        .header-logo{text-align:center; margin-bottom:15px; position: relative;}
+        .header-logo img{width:120px; border-radius:15px; margin-bottom:10px;}
+        
+        h2{ font-weight:700; background:linear-gradient(45deg,var(--primary),var(--secondary)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+        
+        .badge{ display:inline-block; background:rgba(255,255,255,0.2); padding:5px 12px; border-radius:20px; font-size:12px; margin-top:5px;}
 
-.header-logo{text-align:center;margin-bottom:15px; position: relative;}
-.header-logo img{width:120px; border-radius: 50%;}
+        .section{ margin-bottom:15px; padding:15px; border-radius:15px; background:rgba(255,255,255,0.1); }
+        
+        label{ font-size:13px; font-weight:600; margin-bottom:5px; display:block; color: var(--secondary); }
 
-h2{
-    margin:10px 0;
-    font-weight:700;
-    background:linear-gradient(45deg,var(--primary),var(--secondary));
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
+        input, select, textarea {
+            width:100%; padding:10px; border:none; border-radius:10px; margin-bottom:10px; font-size:14px; outline:none;
+        }
 
-.section{
-    margin-bottom:15px;
-    padding:15px;
-    border-radius:15px;
-    background:rgba(255,255,255,0.1);
-}
+        .total-box{ text-align:center; font-size:22px; font-weight:700; margin:15px 0; color: #fff; }
 
-label{font-size:14px;font-weight:600;margin-bottom:5px;display:block;}
+        .btn-order{
+            width:100%; background:var(--whatsapp); border:none; padding:15px; font-size:16px;
+            font-weight:700; color:white; border-radius:15px; cursor:pointer; transition:0.3s;
+        }
 
-input,select,textarea{
-    width:100%;
-    padding:10px;
-    border:none;
-    border-radius:10px;
-    margin-bottom:10px;
-    font-size:15px;
-    outline:none;
-}
-
-.btn-order{
-    width:100%;
-    background:var(--whatsapp);
-    border:none;
-    padding:15px;
-    font-size:16px;
-    font-weight:700;
-    color:white;
-    border-radius:15px;
-    cursor:pointer;
-    transition:0.3s;
-}
-
-/* --- ESTILOS ADMIN --- */
-.admin-panel {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 450px;
-    background: #222;
-    padding: 20px;
-    border-radius: 20px;
-    z-index: 100;
-    max-height: 80vh;
-    overflow-y: auto;
-    border: 2px solid var(--admin);
-}
-
-.admin-day-row {
-    margin-bottom: 15px;
-    border-bottom: 1px solid #444;
-    padding-bottom: 10px;
-}
-
-.admin-day-row input {
-    background: #333;
-    color: white;
-    border: 1px solid #555;
-    margin-bottom: 5px;
-}
-
-.btn-admin-toggle {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: none;
-    border: none;
-    color: rgba(255,255,255,0.3);
-    cursor: pointer;
-    font-size: 10px;
-}
-
-.btn-save-admin {
-    background: var(--admin);
-    color: white;
-    width: 100%;
-    padding: 12px;
-    border: none;
-    border-radius: 10px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
-    z-index: 90;
-}
-</style>
+        /* Admin Styles */
+        .btn-admin-gear { position: absolute; top: 0; right: 0; background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; }
+        .admin-panel {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 400px; background: #1a1a1a; padding: 25px; border-radius: 20px;
+            z-index: 1000; max-height: 80vh; overflow-y: auto; border: 2px solid var(--admin);
+        }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 999; }
+        .admin-day-row { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #333; }
+    </style>
 </head>
-
 <body onload="inicializarApp()">
 
 <div class="container">
     <div class="header-logo">
-        <button class="btn-admin-toggle" onclick="verificarAdmin()">⚙️ Admin</button>
-        <img src="https://i.imgur.com/3FvWdgi.gif" alt="Logo">
+        <button class="btn-admin-gear" onclick="verificarAdmin()">⚙️</button>
+        <img src="https://i.imgur.com/3FvWdgi.gif">
         <h2>Restaurante Gourmet</h2>
         <span id="fechaHoy" class="badge"></span>
     </div>
 
     <form id="orderForm">
         <div class="section">
-            <label>📅 Día del Menú:</label>
+            <label>📅 DÍA DEL MENÚ</label>
             <select id="diaSemana" onchange="actualizarMenu()"></select>
 
-            <label>🍲 Plato Principal:</label>
+            <label>🍲 PLATO PRINCIPAL</label>
             <select id="platoSeleccionado"></select>
         </div>
 
         <div class="section">
-            <label>➕ Adicionales:</label>
-            <label><input type="checkbox" value="2000" onchange="calcularTotal()"> Fruta (+$2.000)</label>
-            <label><input type="checkbox" value="1500" onchange="calcularTotal()"> Huevo Frito (+$1.500)</label>
+            <label>➕ ADICIONALES</label>
+            <label style="color:white; font-weight:normal;"><input type="checkbox" value="2000" onchange="calcularTotal()" style="width:auto;"> Fruta (+$2.000)</label>
+            <label style="color:white; font-weight:normal;"><input type="checkbox" value="1500" onchange="calcularTotal()" style="width:auto;"> Huevo Frito (+$1.500)</label>
 
-            <label>🥤 Bebida:</label>
+            <label style="margin-top:10px;">🥤 BEBIDA</label>
             <select id="bebida" onchange="calcularTotal()">
                 <option value="0">Jugo del día (Incluido)</option>
                 <option value="2500">Limonada (+$2.500)</option>
                 <option value="3000">Gaseosa (+$3.000)</option>
             </select>
-
-            <div class="total-box" style="text-align: center; font-size: 20px; margin-top: 10px;">
-                💰 Total: $<span id="total">0</span>
-            </div>
         </div>
+
+        <div class="total-box">💰 Total: $<span id="total">15,500</span></div>
 
         <div class="section">
-            <label>👤 Datos de Envío:</label>
+            <label>👤 DATOS DE ENVÍO</label>
             <input type="text" id="nombre" placeholder="Tu nombre" required>
-            <input type="text" id="direccion" placeholder="Tu dirección" required>
-            <textarea id="notas" rows="2" placeholder="Notas (sin cebolla, etc.)"></textarea>
+            <input type="text" id="direccion" placeholder="Dirección completa" required>
+            <textarea id="notas" rows="2" placeholder="Notas (Ej: Sin cebolla)"></textarea>
         </div>
 
-        <button type="button" class="btn-order" onclick="enviarWhatsApp()">🚀 Enviar Pedido</button>
+        <button type="button" class="btn-order" onclick="enviarWhatsApp()">🚀 ENVIAR PEDIDO</button>
     </form>
 </div>
 
 <div id="overlay" class="overlay" onclick="cerrarAdmin()"></div>
 <div id="adminPanel" class="admin-panel">
-    <h3 style="margin-bottom:15px; color: var(--admin)">Configurar Menú Semanal</h3>
+    <h3 style="color:var(--admin); margin-bottom:15px;">Panel Administrador</h3>
     <div id="adminInputs"></div>
-    <button class="btn-save-admin" onclick="guardarMenuAdmin()">💾 Guardar Menú</button>
-    <button onclick="cerrarAdmin()" style="background:none; color:white; border:none; margin-top:10px; width:100%; cursor:pointer;">Cancelar</button>
+    <button onclick="guardarMenuAdmin()" style="width:100%; padding:12px; background:var(--admin); border:none; color:white; border-radius:10px; font-weight:bold; cursor:pointer;">💾 Guardar Cambios</button>
 </div>
 
 <script>
-const PRECIO_BASE = 15500;
-const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-
-// Menú por defecto (si no hay nada guardado)
-let menus = {
-    "Lunes": ["Frijoles con Garra", "Pollo al Horno"],
-    "Martes": ["Carne en Salsa", "Pescado Apanado"],
-    "Miércoles": ["Ajiaco Santafereño", "Cerdo Grillé"],
-    "Jueves": ["Sancocho de Pollo", "Arroz Mixto"],
-    "Viernes": ["Bandeja Paisa", "Sobrebarriga"],
-    "Sábado": ["Especial Parrilla", "Sancocho de Gallina"]
+// === 1. CONFIGURACIÓN FIREBASE (REEMPLAZA ESTO) ===
+const firebaseConfig = {
+  apiKey: "AIzaSyCxHaPA9rHQYx4SCqALE5_8wsxmo7_tUfo",
+  authDomain: "prueba-record-d6d5c.firebaseapp.com",
+  databaseURL: "https://prueba-record-d6d5c-default-rtdb.firebaseio.com",
+  projectId: "prueba-record-d6d5c",
+  storageBucket: "prueba-record-d6d5c.firebasestorage.app",
+  messagingSenderId: "423784204085",
+  appId: "1:423784204085:web:c2b2fe61aa9766c0d2ee7c"
 };
 
-function inicializarApp() {
-    // 1. Cargar menú desde LocalStorage si existe
-    const menuGuardado = localStorage.getItem("menuPersonalizado");
-    if (menuGuardado) {
-        menus = JSON.parse(menuGuardado);
-    }
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-    // 2. Llenar el selector de días
+// === 2. VARIABLES GLOBALES ===
+const PRECIO_BASE = 15500;
+const DIAS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+let menus = {
+    "Lunes": ["Cargando...", "..."], "Martes": ["Cargando...", "..."], "Miércoles": ["Cargando...", "..."],
+    "Jueves": ["Cargando...", "..."], "Viernes": ["Cargando...", "..."], "Sábado": ["Cargando...", "..."]
+};
+
+// === 3. INICIO DE APP ===
+function inicializarApp() {
     const selectDia = document.getElementById('diaSemana');
     DIAS.forEach(d => {
         let opt = document.createElement('option');
@@ -233,19 +162,25 @@ function inicializarApp() {
         selectDia.add(opt);
     });
 
-    // 3. Establecer fecha y día actual
+    // Detectar día actual
     const hoy = new Date();
-    const diaReal = DIAS[hoy.getDay() - 1] || "Lunes"; // -1 porque 0 es Domingo
+    const diaReal = DIAS[hoy.getDay() - 1] || "Lunes";
     selectDia.value = diaReal;
+    
+    document.getElementById('fechaHoy').innerText = hoy.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'});
 
-    const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('fechaHoy').innerText = "Hoy es " + hoy.toLocaleDateString('es-ES', opciones);
-
-    // 4. Cargar datos de usuario previos (tu info de entrega)
+    // Cargar datos guardados del usuario (Delivery Info)
     document.getElementById("nombre").value = localStorage.getItem("nombre") || "";
     document.getElementById("direccion").value = localStorage.getItem("direccion") || "";
 
-    actualizarMenu();
+    // CONECTAR A FIREBASE
+    db.ref('menuSemanal').on('value', (snapshot) => {
+        if (snapshot.exists()) {
+            menus = snapshot.val();
+            actualizarMenu();
+        }
+    });
+
     calcularTotal();
 }
 
@@ -253,7 +188,6 @@ function actualizarMenu() {
     const dia = document.getElementById('diaSemana').value;
     const selectPlato = document.getElementById('platoSeleccionado');
     selectPlato.innerHTML = "";
-
     menus[dia].forEach(p => {
         let opt = document.createElement('option');
         opt.text = p;
@@ -268,46 +202,36 @@ function calcularTotal() {
     document.getElementById('total').innerText = total.toLocaleString();
 }
 
-/* --- FUNCIONES ADMINISTRADOR --- */
+// === 4. LÓGICA ADMIN ===
 function verificarAdmin() {
-    const pass = prompt("Ingrese clave de administrador:");
-    if (pass === "1234") { // Cambia esta clave si lo deseas
-        abrirAdmin();
-    } else {
-        alert("Clave incorrecta");
+    if (prompt("Clave de acceso:") === "1234") {
+        const container = document.getElementById('adminInputs');
+        container.innerHTML = "";
+        DIAS.forEach(dia => {
+            const div = document.createElement('div');
+            div.className = "admin-day-row";
+            div.innerHTML = `<label>${dia}</label>
+                <input type="text" id="adm-${dia}-0" value="${menus[dia][0]}">
+                <input type="text" id="adm-${dia}-1" value="${menus[dia][1]}">`;
+            container.appendChild(div);
+        });
+        document.getElementById('adminPanel').style.display = "block";
+        document.getElementById('overlay').style.display = "block";
     }
 }
 
-function abrirAdmin() {
-    const container = document.getElementById('adminInputs');
-    container.innerHTML = "";
-
-    DIAS.forEach(dia => {
-        const div = document.createElement('div');
-        div.className = "admin-day-row";
-        div.innerHTML = `
-            <label style="color:var(--secondary)">${dia}:</label>
-            <input type="text" id="admin-${dia}-1" value="${menus[dia][0]}" placeholder="Plato 1">
-            <input type="text" id="admin-${dia}-2" value="${menus[dia][1]}" placeholder="Plato 2">
-        `;
-        container.appendChild(div);
-    });
-
-    document.getElementById('adminPanel').style.display = "block";
-    document.getElementById('overlay').style.display = "block";
-}
-
 function guardarMenuAdmin() {
+    const nuevoMenu = {};
     DIAS.forEach(dia => {
-        const p1 = document.getElementById(`admin-${dia}-1`).value;
-        const p2 = document.getElementById(`admin-${dia}-2`).value;
-        menus[dia] = [p1, p2];
+        nuevoMenu[dia] = [
+            document.getElementById(`adm-${dia}-0`).value,
+            document.getElementById(`adm-${dia}-1`).value
+        ];
     });
-
-    localStorage.setItem("menuPersonalizado", JSON.stringify(menus));
-    alert("¡Menú actualizado correctamente!");
-    cerrarAdmin();
-    actualizarMenu();
+    db.ref('menuSemanal').set(nuevoMenu).then(() => {
+        alert("¡Menú actualizado globalmente!");
+        cerrarAdmin();
+    });
 }
 
 function cerrarAdmin() {
@@ -315,26 +239,18 @@ function cerrarAdmin() {
     document.getElementById('overlay').style.display = "none";
 }
 
+// === 5. WHATSAPP ===
 function enviarWhatsApp() {
-    const nombre = document.getElementById('nombre').value;
-    const direccion = document.getElementById('direccion').value;
+    const nom = document.getElementById('nombre').value;
+    const dir = document.getElementById('direccion').value;
+    if(!nom || !dir) return alert("Faltan datos de envío");
 
-    if (!nombre || !direccion) {
-        alert("Por favor completa tus datos de envío");
-        return;
-    }
+    localStorage.setItem("nombre", nom);
+    localStorage.setItem("direccion", dir);
 
-    // Guardar datos de usuario para la próxima vez
-    localStorage.setItem("nombre", nombre);
-    localStorage.setItem("direccion", direccion);
-
-    const dia = document.getElementById('diaSemana').value;
-    const plato = document.getElementById('platoSeleccionado').value;
-    const total = document.getElementById('total').innerText;
+    const msj = `*NUEVO PEDIDO*\n\n👤 *Cliente:* ${nom}\n🏠 *Dir:* ${dir}\n🍲 *Plato:* ${document.getElementById('platoSeleccionado').value}\n🥤 *Bebida:* ${document.getElementById('bebida').options[document.getElementById('bebida').selectedIndex].text}\n💰 *Total:* $${document.getElementById('total').innerText}\n📝 *Notas:* ${document.getElementById('notas').value || 'Ninguna'}`;
     
-    let mensaje = `*NUEVO PEDIDO*\n\n📅 *Día:* ${dia}\n👤 *Cliente:* ${nombre}\n🍲 *Plato:* ${plato}\n🏠 *Dirección:* ${direccion}\n💰 *Total:* $${total}`;
-    
-    window.open(`https://wa.me/573143996019?text=${encodeURIComponent(mensaje)}`, '_blank');
+    window.open(`https://wa.me/573143996019?text=${encodeURIComponent(msj)}`, '_blank');
 }
 </script>
 </body>
